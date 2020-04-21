@@ -7,7 +7,7 @@ async function send (sendInfo) {
   // let testAccount = await nodemailer.createTestAccount()
 
   // create reusable transporter object using the default SMTP transport
-  let transporter = nodemailer.createTransport({
+  const transporter = nodemailer.createTransport({
     host: 'smtp.qq.com',
     port: 587,
     secure: false, // true for 465, false for other ports
@@ -24,10 +24,10 @@ async function send (sendInfo) {
   //   user: 'Brian',
   // }
 
-  let url = 'http://www.imooc.com'
+  const url = 'http://www.imooc.com'
 
   // send mail with defined transport object
-  let info = await transporter.sendMail({
+  const info = await transporter.sendMail({
     from: '"认证邮件" <imoocbrian@qq.com>', // sender address
     to: sendInfo.email, // list of receivers
     subject:
