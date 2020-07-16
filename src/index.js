@@ -18,13 +18,16 @@ const app = new koa()
 const isDevMode = process.env.NODE_ENV !== 'production'
 
 // 定义公共路径，不需要jwt鉴权
-const jwt = JWT({ secret: config.JWT_SECRET }).unless({ path: [/^\/public/, /\/login/] })
+const jwt = JWT({ secret: config.JWT_SECRET }).unless({ path: [/^\/public/, /\/login/, /(.*?)/] })
 
 /**
  * 使用koa-compose 集成中间件
  */
 const middleware = compose([
-  koaBody(),
+  koaBody({
+    multipart: true,
+    encoding: 'utf-8'
+  }),
   statics(path.join(__dirname, '../public')),
   cors(),
   jsonutil({ pretty: false, param: 'pretty' }),

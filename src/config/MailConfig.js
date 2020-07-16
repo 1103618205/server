@@ -1,5 +1,6 @@
 import nodemailer from 'nodemailer'
-
+import qs from 'qs'
+import config from '@/config'
 // async..await is not allowed in global scope, must use a wrapper
 async function send (sendInfo) {
   // Generate test SMTP service account from ethereal.email
@@ -12,8 +13,8 @@ async function send (sendInfo) {
     port: 587,
     secure: false, // true for 465, false for other ports
     auth: {
-      user: 'imoocbrian@qq.com', // generated ethereal user
-      pass: 'rbkcbxwrurygjfca' // generated ethereal password
+      user: '1103618205@qq.com', // generated ethereal user
+      pass: 'namkugyzhwiobagj' // generated ethereal password
     }
   })
 
@@ -23,15 +24,16 @@ async function send (sendInfo) {
   //   email: 'imoocbrian@qq.com',
   //   user: 'Brian',
   // }
-
-  const url = 'http://www.imooc.com'
+  const baseUrl = config.baseUrl
+  const route = sendInfo.type === 'email' ? '/login/email' : '/login/reset'
+  const url = `${baseUrl}/#${route}?` + qs.stringify(sendInfo.data)
 
   // send mail with defined transport object
   const info = await transporter.sendMail({
-    from: '"认证邮件" <imoocbrian@qq.com>', // sender address
+    from: '1103618205@qq.com', // sender address
     to: sendInfo.email, // list of receivers
     subject:
-      sendInfo.user !== ''
+      sendInfo.user !== '' && sendInfo.type !== 'email'
         ? `你好开发者，${sendInfo.user}！《慕课网前端全栈实践》注册码`
         : '《慕课网前端全栈实践》注册码', // Subject line
     text: `您在《慕课网前端全栈实践》课程中注册，您的邀请码是${
@@ -44,7 +46,7 @@ async function send (sendInfo) {
           <div>您好，${sendInfo.user}童鞋，重置链接有效时间30分钟，请在${
   sendInfo.expire
 }之前重置您的密码：</div>
-          <a href="${url}" style="padding: 10px 20px; color: #fff; background: #009e94; display: inline-block;margin: 15px 0;">立即重置密码</a>
+          <a href='${url}' style="padding: 10px 20px; color: #fff; background: #009e94; display: inline-block;margin: 15px 0;">立即重置密码</a>
           <div style="padding: 5px; background: #f2f2f2;">如果该邮件不是由你本人操作，请勿进行激活！否则你的邮箱将会被他人绑定。</div>
         </div>
         <div style="background: #fafafa; color: #b4b4b4;text-align: center; line-height: 45px; height: 45px; position: absolute; left: 0; bottom: 0;width: 100%;">系统邮件，请勿直接回复</div>

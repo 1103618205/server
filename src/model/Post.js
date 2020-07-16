@@ -1,4 +1,5 @@
 import mongoose from '@/config/DBHelpler'
+import moment from 'dayjs'
 
 const Schema = mongoose.Schema
 
@@ -22,6 +23,14 @@ PostSchema.pre('save', function (next) {
   next()
 })
 PostSchema.statics = {
+  findByTid: function (id) {
+    console.log(id)
+    return this.findOne({ _id: id })
+      .populate({
+        path: 'uid',
+        select: 'name'
+      })
+  },
   /**
    * 获取文章列表数据
    * @param {Object} options
@@ -36,8 +45,20 @@ PostSchema.statics = {
       .limit(limit)
       .populate({
         path: 'uid',
-        select: 'name'
+        select: 'name isVip pic '
       })
+  },
+  getTopWeek: function () {
+    return this.find({
+      created: {
+        $gte: moment().subtract(7, 'days')
+      }
+    }, {
+      answer: 1,
+      title: 1
+    }).sort({
+      answer: -1
+    }).limit(15)
   }
 }
 const PostModel = mongoose.model('posts', PostSchema)

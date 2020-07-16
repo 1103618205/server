@@ -5,11 +5,11 @@ import jsonwebtoken from 'jsonwebtoken'
 import config from '@/config'
 import { checkCode } from '@/common/Utils'
 import User from '@/model/User'
+import SignRecord from '@/model/SignRecord'
 
 class LoginController {
   async forget (ctx) {
     const { body } = ctx.request
-    console.log(body)
     try {
       // body.username -> database -> email
       const result = await send({
@@ -33,6 +33,7 @@ class LoginController {
   async login (ctx) {
     // 接收用户的数据
     // 返回token
+    console.log('151156156')
     const { body } = ctx.request
     const sid = body.sid
     const code = body.code
@@ -42,19 +43,34 @@ class LoginController {
       // 验证用户账号密码是否正确
       let checkUserPasswd = false
       const user = await User.findOne({ username: body.username })
+      const userObj = user.toJSON()
+      const delmap = ['password']
       if (await bcrypt.compare(body.password, user.password)) {
         checkUserPasswd = true
       }
       // mongoDB查库
       if (checkUserPasswd) {
+        delmap.map(item => {
+          delete userObj[item]
+        })
+        const signRecord = await SignRecord.findByUid(userObj._id)
+        if (signRecord !== null) {
+          if (moment().format('YYYY-MM-DD') === moment(signRecord.created).format('YYYY-MM-DD')) {
+            userObj.isSign = true
+          } else {
+            userObj.isSign = false
+          }
+        } else {
+          userObj.isSign = false
+        }
         // 验证通过，返回Token数据
-        console.log('Hello login')
-        const token = jsonwebtoken.sign({ _id: 'brian' }, config.JWT_SECRET, {
+        const token = jsonwebtoken.sign({ _id: userObj._id }, config.JWT_SECRET, {
           expiresIn: '1d'
         })
         ctx.body = {
           code: 200,
-          token: token
+          token: token,
+          data: userObj
         }
       } else {
         // 用户名 密码验证失败，返回提示

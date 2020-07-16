@@ -56,9 +56,9 @@ const setValue = (key, value, time) => {
 // const {promisify} = require('util');
 // const getAsync = promisify(client.get).bind(client);
 
-// const getValue = (key) => {
-//   return client.getAsync(key)
-// }
+const getValue = (key) => {
+  return client.getAsync(key)
+}
 
 const getHValue = (key) => {
   // v8 Promisify method use util, must node > 8
@@ -81,6 +81,7 @@ const delValue = (key) => {
 export {
   client,
   setValue,
+  getValue,
   getHValue,
   delValue
 }
